@@ -167,7 +167,7 @@
   </div>
 
   <form id="form" autocomplete="off">
-    <input type="text" id="q" placeholder="Ask about tours, prices or wind…" aria-label="Your question" maxlength="500">
+    <input type="text" id="q" placeholder="Ask about tours, prices or places left…" aria-label="Your question" maxlength="500">
     <button class="send" id="send" type="submit">Send</button>
   </form>
 </div>
@@ -176,7 +176,7 @@
   const CSV_URL = "https://bdaib-hub.pages.dev/data/dockside/sessions.csv";
   const WEATHER_URL = "https://api.open-meteo.com/v1/forecast?latitude=53.3441&longitude=-6.2386&current=temperature_2m,wind_speed_10m,wind_gusts_10m,precipitation&timezone=Europe%2FDublin";
   const BRAIN_URL = "https://luas-class.kluxy.app/chat";
-  const SYSTEM = "You are Ask Dockside, the customer assistant for Dockside Paddle Co. a watersports company at Grand Canal Dock, five minutes from NCI: paddle boards, kayaks, a dragon boat, a wakeboard cable and a floating sauna. Answer only from the live data you are given. Quote exact prices in euro, and slots available. If something is not in the data, say so. If a value looks implausible, say so and suggest the customer checks with staff. Be warm and brief.";
+  const SYSTEM = "You are Ask Dockside, the customer assistant for Dockside Paddle Co. a watersports company at Grand Canal Dock, five minutes from NCI: paddle boards, kayaks, a dragon boat, a wakeboard cable and a floating sauna. Answer only from the live data you are given. Answer only what the customer asked, in one to three short sentences, with no extra details and no unrequested lists. Quote exact prices in euro, and slots available, when relevant to the question. Only mention wind or weather if the customer asks about it, or if the current wind speed is above the max_wind_kmh of a session they are asking about (so it may not run) or within 3 km/h of that limit; otherwise do not mention wind or weather at all. If something is not in the data, say so. If a value looks implausible, say so and suggest the customer checks with staff. Be warm and brief.";
 
   const chat = document.getElementById("chat");
   const form = document.getElementById("form");
@@ -240,7 +240,8 @@
       "temperature_2m = " + cur.temperature_2m + " " + (units.temperature_2m || "°C") + "\n" +
       "precipitation = " + cur.precipitation + " " + (units.precipitation || "mm") + "\n" +
       "Current local time in Dublin: " + dublinNow + "\n" +
-      "Rule: a session runs only if the current wind_speed_10m is at or below that session's max_wind_kmh.";
+      "Rule: a session runs only if the current wind_speed_10m is at or below that session's max_wind_kmh. " +
+      "Use this weather only to check that rule; do not mention it unless the customer asked about wind or weather, or the rule affects a session they asked about.";
     return { text: csv + weatherBlock, fetchedAt };
   }
 
@@ -292,7 +293,7 @@
     if (e.target.classList.contains("chip")) handleSend(e.target.textContent);
   });
 
-  addMessage("bot", "Hi, I'm Ask Dockside 🌊 Ask me about today's paddle boards, kayaks, the dragon boat, the wakeboard cable or the floating sauna: prices, free places and whether the wind allows them to run.");
+  addMessage("bot", "Hi, I'm Ask Dockside 🌊 Ask me about today's sessions, prices and free places.");
 </script>
 </body>
 </html>
